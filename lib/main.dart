@@ -1,5 +1,6 @@
 import 'package:expenses/components/chart.dart';
 import 'package:expenses/components/transaction_form.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:expenses/models/transaction.dart';
@@ -16,7 +17,6 @@ class ExpensesApp extends StatelessWidget {
       home:MyHomePage(),
       theme: ThemeData(
         primaryColor: Colors.purple,
-        accentColor: Colors.amber,
         fontFamily: "Quicksand",
         textTheme: ThemeData.light().textTheme.copyWith(
           headline6: TextStyle(
@@ -95,10 +95,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar(
+        backgroundColor: Colors.purple,
         title: Text(
           "Despesas Pessoais",
           style: TextStyle(
             fontFamily: 'OpenSans',
+            fontSize: 10 * MediaQuery.of(context).textScaleFactor,
           ),
           ),
         actions: <Widget>[
@@ -130,10 +132,13 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.amber,
         child: Icon(Icons.add),
         onPressed: () => _openTransactionFormModal(context)),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      
     );
   }
 }
