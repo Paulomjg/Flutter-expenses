@@ -1,13 +1,17 @@
-import 'package:expenses/components/chart.dart';
+import 'dart:math';
+import 'dart:io';
+
 import 'package:expenses/components/transaction_form.dart';
-import 'package:flutter/gestures.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
+
+import 'package:expenses/components/chart.dart';
 import 'package:expenses/models/transaction.dart';
 import 'package:flutter/services.dart';
-import 'dart:math';
 import './components/transaction_form.dart';
 import './components/transaction_list.dart';
+
 main() => runApp(ExpensesApp());
 
 class ExpensesApp extends StatelessWidget {
@@ -94,9 +98,31 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _getIconButton(IconData icon, Function() fn){
+    return Platform.isIOS
+      ? GestureDetector(onTap: fn, child: Icon(icon))
+      : IconButton(onPressed: fn, icon: Icon(icon));
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final actions = <Widget>[
+          if (isLandscape)
+          _getIconButton(
+            _showChart ? Icons.list : Icons.bar_chart_rounded,
+            (){
+              setState(() {
+                _showChart = ! _showChart;
+              });
+            },
+          ), 
+          _getIconButton(
+            Icons.add_box_outlined,
+            () => _openTransactionFormModal(context),
+          )
+        ];
+
     final appBar = AppBar(
         backgroundColor: Colors.purple,
         title: Text(
@@ -106,21 +132,7 @@ class _MyHomePageState extends State<MyHomePage> {
             fontSize: 10 * MediaQuery.of(context).textScaleFactor,
           ),
           ),
-        actions: <Widget>[
-          if (isLandscape)
-          IconButton(
-            icon: Icon (_showChart ? Icons.list : Icons.bar_chart_rounded),
-            onPressed: (){
-              setState(() {
-                _showChart = ! _showChart;
-              });
-            },
-          ), 
-          IconButton(
-            icon: Icon(Icons.add_box_outlined),
-            onPressed:() => _openTransactionFormModal(context),
-          )
-        ],
+        actions: actions,
       );
 
     final avaliableHeight = MediaQuery.of(context).size.height-
@@ -159,16 +171,27 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
 
-    return Scaffold(
-      appBar: appBar,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.amber,
-        child: Icon(Icons.add),
-        onPressed: () => _openTransactionFormModal(context)),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      body: bodyPage,
-      
-     
-    );
+    return Platform.isIOS 
+
+      ? CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              middle: Text('Despesas Pessoais'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: actions,
+              ),
+            ),
+            child: bodyPage,
+          )
+
+      :Scaffold(
+        appBar: appBar,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.amber,
+          child: Icon(Icons.add),
+          onPressed: () => _openTransactionFormModal(context)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        body: bodyPage,
+      );
   }
 }
